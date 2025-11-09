@@ -24,4 +24,23 @@
         </tr>
     </thead>
     <tbody>
-        
+        @foreach($kategoris as $kategori)
+        <tr>
+            <td>{{ $loop->iteration }}</td>
+            <td>{{ $kategori->nama_kategori }}</td>
+            <td>{{ $kategori->keterangan }}</td>
+            <td>
+                <a href="{{ route('kategori.edit', $kategori->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                <form action="{{ route('kategori.destroy', $kategori->id) }}" method="POST" class="d-inline">
+                    @csrf
+                    @method('DELETE')
+                    <button class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus?')">Hapus</button>
+                </form>
+            </td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
+@endsection
+
+</html>
