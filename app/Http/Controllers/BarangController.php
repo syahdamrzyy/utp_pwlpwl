@@ -1,0 +1,66 @@
+<?php
+namespace App\Http\Controllers;
+
+use App\Models\Barang;
+use App\Models\Kategori;
+use Illuminate\Http\Request;
+
+class BarangController extends Controller
+{
+    public function index()
+    {
+        $barangs = Barang::with('kategori')->get();
+        return view('barang.index', compact('barangs'));
+    }
+
+    public function create()
+    {
+        // Ambil semua kategori dan kirim ke view
+        $kategoris = Kategori::orderBy('nama_kategori')->get();
+        return view('barang.create', compact('kategoris'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nama_barang' => 'required|string|max:255',
+            'harga'       => 'required|numeric',
+            'stok'        => 'required|integer',
+            'kategori_id' => 'required|exists:kategoris,id',
+        ]);
+
+        Barang::create($request->only(['nama_barang','harga','stok','kategori_id']));
+
+        return redirect()->route('barang.index')->with('success','Barang berhasil ditambahkan!');
+    }
+
+    public function edit($id)
+    {
+        $barang = Barang::findOrFail($id);
+        // Juga kirimkan daftar kategori supaya dropdown terisi
+        $kategoris = Kategori::orderBy('nama_kategori')->get();
+        return view('barang.edit', compact('barang','kategoris'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nama_barang' => 'required|string|max:255',
+            'harga'       => 'required|numeric',
+            'stok'        => 'required|integer',
+            'kategori_id' => 'required|exists:kategoris,id',
+        ]);
+
+        $barang = Barang::findOrFail($id);
+        $barang->update($request->only(['nama_barang','harga','stok','kategori_id']));
+
+        return redirect()->route('barang.index')->with('success','Barang berhasil diperbarui!');
+    }
+
+    public function destroy($id)
+    {
+        $barang = Barang::findOrFail($id);
+        $barang->delete();
+        return redirect()->route('barang.index')->with('success','Barang berhasil dihapus!');
+    }
+}
